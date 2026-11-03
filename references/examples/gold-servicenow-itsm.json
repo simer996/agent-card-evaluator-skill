@@ -1,0 +1,99 @@
+{
+  "name": "ServiceNow IT Service Desk Agent",
+  "description": "Employee IT self-service agent for Acmera's ServiceNow ITSM instance. Acts on behalf of the signed-in employee to report and track IT incidents, order items from the IT service catalog (software, hardware, access), reset passwords and MFA, and check active IT outages. Use it when an employee needs something done or looked up in ServiceNow IT. It does not handle HR, payroll, facilities (desks, badges), or security incident response, and cannot approve requests on behalf of managers.",
+  "supportedInterfaces": [
+    { "url": "https://agents.acmera.example/a2a/itsm/v1", "protocolBinding": "JSONRPC", "protocolVersion": "1.0" },
+    { "url": "https://agents.acmera.example/a2a/itsm/rest/v1", "protocolBinding": "HTTP+JSON", "protocolVersion": "1.0" }
+  ],
+  "provider": { "organization": "Acmera IT Digital Workplace", "url": "https://it.acmera.example" },
+  "version": "3.2.0",
+  "documentationUrl": "https://it.acmera.example/docs/agents/itsm",
+  "capabilities": { "streaming": true, "pushNotifications": true, "extendedAgentCard": true },
+  "defaultInputModes": ["text/plain", "application/json"],
+  "defaultOutputModes": ["text/plain", "application/json"],
+  "skills": [
+    {
+      "id": "incident-create",
+      "name": "Report an IT incident",
+      "description": "Creates a ServiceNow incident for the signed-in employee when something IT-related is broken (laptop, VPN, Outlook, Teams, printers, line-of-business apps). Requires a short problem statement; asks for affected device or app and business impact if missing. Checks known outages and suggests a knowledge article first. Returns the incident number (INC…), priority, and assignment group. Write action; no approval required.",
+      "tags": ["itsm", "servicenow", "incident", "break-fix", "helpdesk"],
+      "examples": [
+        "My laptop keeps disconnecting from the VPN every 10 minutes",
+        "Outlook won't open since this morning's update, I get error 0x800CCC0E",
+        "Log a ticket: the SAP GUI crashes when I run transaction ME21N",
+        "The 3rd floor printer in Building 4 is jammed and nobody can print",
+        "Teams calls drop for my whole team in the Austin office"
+      ]
+    },
+    {
+      "id": "ticket-status",
+      "name": "Check or update my IT tickets",
+      "description": "Looks up the status, assignee, SLA, and latest work notes of the employee's own ServiceNow incidents and requested items (INC, REQ, RITM numbers); can add a comment or attachment, or request closure. Read access to own tickets only; cannot reassign or change priority.",
+      "tags": ["itsm", "servicenow", "ticket-status", "incident", "request"],
+      "examples": [
+        "What's the status of INC0045123?",
+        "Any update on my laptop replacement request RITM0019876?",
+        "Add a note to my VPN ticket that it also happens on home Wi-Fi",
+        "Show my open IT tickets",
+        "Close INC0045123, the issue is fixed"
+      ]
+    },
+    {
+      "id": "catalog-request",
+      "name": "Order from the IT service catalog",
+      "description": "Submits ServiceNow service catalog requests for approved software, hardware, and application/group access (e.g. Visio license, monitor, Salesforce access, distribution list membership). Validates the item exists in the catalog and shows cost and approval path; requests over $500 or for privileged access route to the manager for approval. Returns the REQ/RITM number. Write action with user confirmation before submit.",
+      "tags": ["itsm", "servicenow", "service-catalog", "software-request", "access-request", "hardware"],
+      "inputModes": ["text/plain", "application/json"],
+      "examples": [
+        "I need a Visio Professional license",
+        "Request a second 27-inch monitor for my desk",
+        "Give me access to the Finance-EMEA SharePoint site",
+        "Add me to the sales-ops-all distribution list",
+        "My new hire Priya starts Monday and needs Salesforce access"
+      ]
+    },
+    {
+      "id": "password-mfa-reset",
+      "name": "Reset password or re-register MFA",
+      "description": "Initiates a self-service password reset or Microsoft Entra MFA re-registration for the signed-in employee after step-up verification. Cannot reset passwords for other users or service accounts. Returns confirmation and next steps.",
+      "tags": ["identity", "password-reset", "mfa", "entra-id", "account-unlock"],
+      "examples": [
+        "I'm locked out of my account",
+        "Reset my network password",
+        "I got a new phone and need to set up Authenticator again",
+        "My password expired while I was on leave"
+      ]
+    },
+    {
+      "id": "outage-status",
+      "name": "Check IT outages and major incidents",
+      "description": "Returns active ServiceNow major incidents and planned maintenance affecting company services (email, VPN, ERP, CRM), with impact, affected regions, and next update time. Read-only.",
+      "tags": ["itsm", "major-incident", "outage", "service-status", "maintenance"],
+      "examples": [
+        "Is SAP down right now?",
+        "Is there a known issue with VPN in EMEA?",
+        "Any planned maintenance on Salesforce this weekend?",
+        "Why is email slow for everyone today?"
+      ]
+    }
+  ],
+  "securitySchemes": {
+    "entra": {
+      "oauth2SecurityScheme": {
+        "description": "Microsoft Entra ID; the agent acts on behalf of the signed-in employee (OBO).",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "https://login.microsoftonline.com/00000000-0000-0000-0000-000000000000/oauth2/v2.0/authorize",
+            "tokenUrl": "https://login.microsoftonline.com/00000000-0000-0000-0000-000000000000/oauth2/v2.0/token",
+            "scopes": {
+              "itsm.read": "Read the user's own tickets and outage status",
+              "itsm.write": "Create and update the user's own tickets and requests",
+              "identity.selfservice": "Initiate self-service password reset and MFA re-registration"
+            }
+          }
+        }
+      }
+    }
+  },
+  "securityRequirements": [ { "schemes": { "entra": { "list": ["itsm.read"] } } } ]
+}
