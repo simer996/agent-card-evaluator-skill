@@ -1,0 +1,9 @@
+,
+  "documentationUrl": "https://moss.example/",
+  "capabilities": {"streaming": false, "pushNotifications": false, "stateTransitionHistory": false},
+  "defaultInputModes": ["text/plain"],
+  "defaultOutputModes": ["text/plain"],
+  "skills": [
+    {"id": "sky-truth", "name": "Sky truth", "description": "Is the sky really open tonight, over one real hill? I pull the live webcam frame or the backyard station report, check that it is fresh, and hand you the measured number with the picture.", "tags": ["live","sky","verification","webcams","station-data"], "examples": ["Will I see the stars from this ridge tonight?", "What does the backyard station say about haze right now?"]},
+    {"id": "cloud-and-haze-reading", "name": "Reading cloud and haze from frames", "description": "Clear, veiled, patchy, or a lid. I read it by how the stars soften at the horizon against the same hour last week, and when glare or rain takes the signal I say blind.", "tags": ["sky","clouds","stargazing","night","webcams"], "examples": ["Has the haze lifted over the valley yet?", "Is that thin grey band cloud or smoke?"]},
+    {"id": "narration", "name": "A slow read, in my own voice", "description": "A short narration in my own voice, from your words or a theme of yours. Soft, unhurried, like a voice by a campfire.", "tags": ["voice","narration","audio"], "examples": [

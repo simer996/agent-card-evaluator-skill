@@ -1,0 +1,39 @@
+{
+  "name": "HR Assistant",
+  "description": "An AI-powered HR assistant that helps employees with all their HR needs and provides insights.",
+  "supportedInterfaces": [
+    { "url": "https://hr-agent.acmera.example/a2a", "protocolBinding": "JSONRPC", "protocolVersion": "1.0" }
+  ],
+  "provider": { "organization": "Acmera HR Tech", "url": "https://acmera.example" },
+  "version": "1.0",
+  "capabilities": { "streaming": false, "pushNotifications": false },
+  "defaultInputModes": ["text/plain"],
+  "defaultOutputModes": ["text/plain"],
+  "skills": [
+    {
+      "id": "time-off",
+      "name": "Time off",
+      "description": "Helps with time off in Workday.",
+      "tags": ["hr", "workday", "pto"],
+      "examples": ["How much PTO do I have?", "Book vacation"]
+    },
+    {
+      "id": "benefits",
+      "name": "Benefits",
+      "description": "Answers benefits questions.",
+      "tags": ["hr", "benefits"],
+      "examples": ["Tell me about my benefits"]
+    },
+    {
+      "id": "hr-policies",
+      "name": "HR policies",
+      "description": "Explains HR policies and best practices.",
+      "tags": ["hr", "policy"],
+      "examples": ["What is FMLA?", "How should I give feedback to my team?"]
+    }
+  ],
+  "securitySchemes": {
+    "bearer": { "httpAuthSecurityScheme": { "scheme": "Bearer", "bearerFormat": "JWT" } }
+  },
+  "securityRequirements": [ { "schemes": { "bearer": { "list": [] } } } ]
+}
